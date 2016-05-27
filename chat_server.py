@@ -3,6 +3,9 @@ import random
 from geventwebsocket.handler import WebSocketHandler
 from gevent import pywsgi, sleep
 
+from myencoding import *
+import codecs
+
 ws_list = set()
 
 def chat_handle(environ, start_response):
@@ -25,6 +28,8 @@ def chat_handle(environ, start_response):
             ws_list.remove(s)
     print 'exit!', len(ws_list)
 
+import cgi
+
 def myapp(environ, start_response):  
     path = environ["PATH_INFO"]
     method = environ["REQUEST_METHOD"]
@@ -33,14 +38,15 @@ def myapp(environ, start_response):
     print method
 
     if path == "/": 
-        start_response("200 OK", [("Content-Type", "text/html")])  
+        start_response("200 OK", [("Content-Type", "text/html;charset=UTF-8")])  
         return open('./chat_login.html').read()
 
     elif path == "/login" and method == "POST":
-        wsgi_input = environ['wsgi.input']
-        username = wsgi_input.read().split('=')[1]
-
-        start_response("200 OK", [("Content-Type", "text/html")])  
+        wsgi_input     = environ['wsgi.input']
+        content_length = int(environ.get('CONTENT_LENGTH'))
+        query = cgi.parse_qsl(wsgi_input.read(content_length))
+        username = query[0][1]
+        start_response("200 OK", [("Content-Type", "text/html;charset=UTF-8")])  
         return open('./chat_client.html').read() % username
 
     elif path == "/chat":  
