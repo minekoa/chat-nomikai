@@ -1,9 +1,8 @@
-import os
-import random
 from geventwebsocket.handler import WebSocketHandler
 from gevent import pywsgi, sleep
 
 import cgi
+import wsgiref.util
 from chat_commander import ChatCommander
 
 def broadcast(msg):
@@ -21,7 +20,6 @@ commander = ChatCommander()
 commander.set_message_function(broadcast)
 
 def chat_handle(environ, start_response):
-    global cnt
     ws = environ['wsgi.websocket']
     ws_list.add(ws)
     print 'enter!', len(ws_list)
@@ -36,23 +34,27 @@ def chat_handle(environ, start_response):
 
     print 'exit!', len(ws_list)
 
-def chatapp(environ, start_response):  
-    path = environ["PATH_INFO"]
-    method = environ["REQUEST_METHOD"]
+def wsgi_query(environ):
+    wsgi_input     = environ['wsgi.input']
+    content_length = int(environ.get('CONTENT_LENGTH'))
+    return dict(cgi.parse_qsl(wsgi_input.read(content_length)))
 
-    print path
+def chatapp(environ, start_response):  
+    path    = environ["PATH_INFO"]
+    method  = environ["REQUEST_METHOD"]
+    app_uri = wsgiref.util.application_uri(environ).strip('/').split('://')   # "<scheme>://<netloc>/" -> ["<scheme>", "<netloc>"]
 
     if path == "/": 
         start_response("200 OK", [("Content-Type", "text/html;charset=UTF-8")])  
-        return open('./chat_login.html').read() % "http://127.0.0.1:8080/client"
+        uri = "%s://%s/client" % (app_uri[0], app_uri[1])
+        return open('./chat_login.html').read() % uri
 
     elif path == "/client" and method == "POST":
-        wsgi_input     = environ['wsgi.input']
-        content_length = int(environ.get('CONTENT_LENGTH'))
-        query = cgi.parse_qsl(wsgi_input.read(content_length))
-        username = query[0][1]
+        query = wsgi_query(environ)
+        username = query['name']
         start_response("200 OK", [("Content-Type", "text/html;charset=UTF-8")])  
-        return open('./chat_client.html').read() % ("ws://127.0.0.1:8080/chat", username)
+        uri = "ws://%s/chat" % app_uri[1]
+        return open('./chat_client.html').read() % (uri, username)
 
     elif path == "/chat":  
         return chat_handle(environ, start_response)
