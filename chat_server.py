@@ -3,8 +3,7 @@ import random
 from geventwebsocket.handler import WebSocketHandler
 from gevent import pywsgi, sleep
 
-from myencoding import *
-import codecs
+import cgi
 
 ws_list = set()
 
@@ -12,7 +11,6 @@ def chat_handle(environ, start_response):
     global cnt
     ws = environ['wsgi.websocket']
     ws_list.add(ws)
-    print dir(ws)
     print 'enter!', len(ws_list)
     while 1:
         msg = ws.receive()
@@ -28,26 +26,23 @@ def chat_handle(environ, start_response):
             ws_list.remove(s)
     print 'exit!', len(ws_list)
 
-import cgi
-
-def myapp(environ, start_response):  
+def chatapp(environ, start_response):  
     path = environ["PATH_INFO"]
     method = environ["REQUEST_METHOD"]
 
     print path
-    print method
 
     if path == "/": 
         start_response("200 OK", [("Content-Type", "text/html;charset=UTF-8")])  
-        return open('./chat_login.html').read()
+        return open('./chat_login.html').read() % "http://127.0.0.1:8080/client"
 
-    elif path == "/login" and method == "POST":
+    elif path == "/client" and method == "POST":
         wsgi_input     = environ['wsgi.input']
         content_length = int(environ.get('CONTENT_LENGTH'))
         query = cgi.parse_qsl(wsgi_input.read(content_length))
         username = query[0][1]
         start_response("200 OK", [("Content-Type", "text/html;charset=UTF-8")])  
-        return open('./chat_client.html').read() % username
+        return open('./chat_client.html').read() % ("ws://127.0.0.1:8080/chat", username)
 
     elif path == "/chat":  
         return chat_handle(environ, start_response)
@@ -56,9 +51,6 @@ def myapp(environ, start_response):
         start_response("404 NOT FOUND", [("Content-Type", "text/plain")])  
         return "404 NOT FOUND ;-p"
 
-
 if __name__ == '__main__':
-    print '### START ###'
-    server = pywsgi.WSGIServer(('0.0.0.0', 8080), myapp, handler_class=WebSocketHandler)
+    server = pywsgi.WSGIServer(('0.0.0.0', 8080), chatapp, handler_class=WebSocketHandler)
     server.serve_forever()
-    print '### END ###'

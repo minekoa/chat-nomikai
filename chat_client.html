@@ -3,24 +3,25 @@
 <head>
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script>
+var url      = "%s";
+var username = "%s";
 $(function() {
     var data = {};
-    ws = new WebSocket("ws://127.0.0.1:8080/chat");
+    ws = new WebSocket(url);
     ws.onopen = function() {
-        ws.send($('#username').val() + ';' + 'hi');
+        ws.send(username + ';' + 'hi');
     };
     ws.onmessage = function(e) {
       $("#holder").append($('<p>'+e.data+'</p>'));
     };
     $('#sender').append($('<button/>').text('send').click(function(){
-        ws.send($('#username').val() + ';' + $('#message').val());
+        ws.send(username + ';' + $('#message').val());
     }));
 });
 </script>
 </head>
 <body>
 <div id="sender">
-<input type="hidden" id="username" value="%s" />
 <input type="text" id="message" value="text" />
 </div>
 <h3>Messages</h3>
