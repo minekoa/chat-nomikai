@@ -4,8 +4,21 @@ from geventwebsocket.handler import WebSocketHandler
 from gevent import pywsgi, sleep
 
 import cgi
+from chat_commander import ChatCommander
 
-ws_list = set()
+def broadcast(msg):
+    remove = set()
+    for s in ws_list:
+        try:
+            s.send(msg)
+        except Exception:
+            remove.add(s)
+    for s in remove:
+        ws_list.remove(s)
+
+ws_list   = set()
+commander = ChatCommander()
+commander.set_message_function(broadcast)
 
 def chat_handle(environ, start_response):
     global cnt
@@ -14,16 +27,13 @@ def chat_handle(environ, start_response):
     print 'enter!', len(ws_list)
     while 1:
         msg = ws.receive()
-        if msg is None:
-            break
-        remove = set()
-        for s in ws_list:
-            try:
-                s.send(msg)
-            except Exception:
-                remove.add(s)
-        for s in remove:
-            ws_list.remove(s)
+        if msg is None: break
+
+        broadcast(msg)
+        commander.run(msg)
+        for cmsg in commander.messages:
+            broadcast(cmsg)
+
     print 'exit!', len(ws_list)
 
 def chatapp(environ, start_response):  
