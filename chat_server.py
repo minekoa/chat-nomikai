@@ -12,7 +12,6 @@ def chat_handle(environ, start_response):
     print dir(ws)
     print 'enter!', len(ws_list)
     while 1:
-#        msg = ws.wait()
         msg = ws.receive()
         if msg is None:
             break
@@ -28,13 +27,28 @@ def chat_handle(environ, start_response):
 
 def myapp(environ, start_response):  
     path = environ["PATH_INFO"]
+    method = environ["REQUEST_METHOD"]
+
     print path
+    print method
+
     if path == "/": 
         start_response("200 OK", [("Content-Type", "text/html")])  
-        return open('./chat_client.html').read()
+        return open('./chat_login.html').read()
+
+    elif path == "/login" and method == "POST":
+        wsgi_input = environ['wsgi.input']
+        username = wsgi_input.read().split('=')[1]
+
+        start_response("200 OK", [("Content-Type", "text/html")])  
+        return open('./chat_client.html').read() % username
+
     elif path == "/chat":  
         return chat_handle(environ, start_response)
-    raise Exception('Not found.')
+
+    else:
+        start_response("404 NOT FOUND", [("Content-Type", "text/plain")])  
+        return "404 NOT FOUND ;-p"
 
 
 if __name__ == '__main__':
