@@ -2,8 +2,15 @@
 
 import subprocess
 from datetime import datetime
+import threading
+import os
 
 def jtalk(msg):
+    th = threading.Thread(target=jtalk_proc, args=(msg,))
+    th.start()
+
+
+def jtalk_proc(msg):
     now = datetime.now()
     fname = 'say%02dT%02d%02d%02d_%03d.wav' % (now.day, now.hour, now.minute, now.second, now.microsecond)
 
@@ -18,8 +25,9 @@ def jtalk(msg):
     c.stdin.close()
     c.wait()
 
-    subprocess.Popen(['aplay', '-q', fname])
-        
+    a = subprocess.Popen(['aplay', '-q', fname])
+    a.wait()
+    os.remove(fname)
 
 if __name__ == '__main__':
     jtalk(u'ゆっくりしていってね！'.encode('utf-8'))
