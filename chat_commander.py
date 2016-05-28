@@ -2,7 +2,8 @@
 from gevent import pywsgi, sleep
 
             
-#import Rpi.GPIO as gpio
+import RPi.GPIO as gpio
+from jtalk import jtalk
 
 class ChatCommander(object):
     def __init__(self):
@@ -12,7 +13,7 @@ class ChatCommander(object):
     def elaborate(self):
         self.commands['say']   = self.say
         self.commands['sleep'] = self.mysleep
-#        self.elaborateRaspyGpio()
+        self.elaborateRaspyGpio()
 
     def setMessageFunction(self, msg_func):
         self.msg_func = msg_func
@@ -47,7 +48,8 @@ class ChatCommander(object):
     #------------------------------------------------------------
 
     def say(self, params):
-        self.showMessage( '(SAY); %s' % ' '.join(params))
+        jtalk(' '.join(params))
+#        self.showMessage( '(SAY); %s' % ' '.join(params))
 
     #------------------------------------------------------------
     # sleep command
@@ -61,9 +63,8 @@ class ChatCommander(object):
     #------------------------------------------------------------
 
     def elaborateRaspyGpio(self):
-        gpio.setup()
-        gpio.setmode(gpio.BCN) # or gpio.BOARD
-        # gpio.setup(21, gpio.OUT)  
+        gpio.setmode(gpio.BOARD) # or gpio.BOARD
+        gpio.setup(11, gpio.OUT)  
         # gpio.setup(22, gpio.IN)  
 
         self.commands['wt'] = self.gpio_output
