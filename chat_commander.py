@@ -4,6 +4,8 @@ from gevent import pywsgi, sleep
             
 import RPi.GPIO as gpio
 from jtalk import jtalk
+import picam
+from datetime import datetime
 
 class ChatCommander(object):
     def __init__(self):
@@ -14,6 +16,7 @@ class ChatCommander(object):
         self.commands['say']   = self.say
         self.commands['sleep'] = self.mysleep
         self.elaborateRaspyGpio()
+        self.commands['cheez'] = self.cheez
 
     def setMessageFunction(self, msg_func):
         self.msg_func = msg_func
@@ -49,7 +52,6 @@ class ChatCommander(object):
 
     def say(self, params):
         jtalk(' '.join(params))
-#        self.showMessage( '(SAY); %s' % ' '.join(params))
 
     #------------------------------------------------------------
     # sleep command
@@ -57,6 +59,19 @@ class ChatCommander(object):
 
     def mysleep(self, params):
         sleep(int(params[0]))
+
+    #------------------------------------------------------------
+    # cheez command
+    #------------------------------------------------------------
+
+    def cheez(self, params):
+        jtalk('はいっチーーズ!')
+        sleep(2)
+        now = datetime.now() 
+        fname = 'img/img%02dT%02d%02d%02d_%05d.jpg' % (now.day, now.hour, now.minute, now.second, now.microsecond)
+        
+        picam.shoot(fname)
+        self.showMessage('(CHEEZ);<img src="%s">' % fname)
 
     #------------------------------------------------------------
     # gpio command

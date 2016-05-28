@@ -3,6 +3,7 @@ from gevent import pywsgi, sleep
 
 import cgi
 import wsgiref.util
+import re
 from chat_commander import ChatCommander
 
 def wsgi_query(environ):
@@ -33,13 +34,15 @@ class ChatApp(object):
     def __call__(self, environ, start_response):  
         path    = environ["PATH_INFO"]
         method  = environ["REQUEST_METHOD"]
-     
+
         if path == "/": 
             return self.index_handle(environ, start_response)
         elif path == "/client" and method == "POST":
             return self.client_handle(environ, start_response)
         elif path == "/chat":  
             return self.chat_handle(environ, start_response)
+        elif re.match('/img/.*', path):
+            return self.img_handle(environ, start_response, path)
      
         else:
             start_response("404 NOT FOUND", [("Content-Type", "text/plain")])  
@@ -67,6 +70,10 @@ class ChatApp(object):
             self.commander.run(msg)
         print 'exit!', len(ws_list)
 
+    def img_handle(self, environ, start_response, path):
+        start_response("200 OK", [("Content-Type", "image/jpeg")])
+        return open(path[1:],'rb') # remove '/'
+        
 if __name__ == '__main__':
     server = pywsgi.WSGIServer(('0.0.0.0', 8080), ChatApp(), handler_class=WebSocketHandler)
     server.serve_forever()
