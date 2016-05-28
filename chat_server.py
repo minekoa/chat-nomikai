@@ -11,14 +11,14 @@ def wsgi_query(environ):
     return dict(cgi.parse_qsl(wsgi_input.read(content_length)))
 
 def wsgi_scheme_and_netloc(environ):
-    ''' "<scheme>://<netloc>/" -> ["<scheme>", "<netloc>"] '''
-    return wsgiref.util.application_uri(environ).strip('/').split('://')   
+    ''' "<scheme>://<netloc>/" -> ("<scheme>", "<netloc>") '''
+    return tuple(wsgiref.util.application_uri(environ).strip('/').split('://'))
 
 class ChatApp(object):
     def __init__(self):
         self.ws_list   = set()
         self.commander = ChatCommander()
-        self.commander.set_message_function(self.broadcast)
+        self.commander.setMessageFunction(self.broadcast)
 
     def broadcast(self, msg):
         remove = set()
@@ -46,16 +46,14 @@ class ChatApp(object):
             return "404 NOT FOUND ;-p"
 
     def index_handle(self, environ, start_response):
+        uri = "%s://%s/client" % wsgi_scheme_and_netloc(environ)
         start_response("200 OK", [("Content-Type", "text/html;charset=UTF-8")])  
-        schme_netloc = wsgi_scheme_and_netloc(environ)
-        uri = "%s://%s/client" % (schme_netloc[0], schme_netloc[1])
         return open('./chat_login.html').read() % uri
 
     def client_handle(self, environ, start_response):
-        query = wsgi_query(environ)
-        username = query['name']
+        username = wsgi_query(environ)['name']
+        uri      = "ws://%s/chat" % wsgi_scheme_and_netloc(environ)[1]
         start_response("200 OK", [("Content-Type", "text/html;charset=UTF-8")])  
-        uri = "ws://%s/chat" % wsgi_scheme_and_netloc(environ)[1]
         return open('./chat_client.html').read() % (uri, username)
 
     def chat_handle(self, environ, start_response):

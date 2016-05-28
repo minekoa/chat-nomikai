@@ -7,7 +7,6 @@ from gevent import pywsgi, sleep
 class ChatCommander(object):
     def __init__(self):
         self.commands = {}
-#        self.message  = []
         self.elaborate()
 
     def elaborate(self):
@@ -15,34 +14,32 @@ class ChatCommander(object):
         self.commands['sleep'] = self.mysleep
 #        self.elaborateRaspyGpio()
 
-    def set_message_function(self, msg_func):
+    def setMessageFunction(self, msg_func):
         self.msg_func = msg_func
 
-    def show_message(self, message):
+    def showMessage(self, message):
         self.msg_func(message)
 
     def run(self, source):
         self.messages  = []
 
         lst = source.split(';')
-        print lst
         self.username = lst[0]
         stmlist  = lst[1:]
 
         for stm in stmlist:
             if len(stm) != 0 and stm[0] != '!': continue
             tokens = stm[1:].split(' ')
-            print 'T', tokens
-            self.exec_command(tokens[0], tokens[1:])
+            self.execCommand(tokens[0], tokens[1:])
 
-    def exec_command(self, cmd, params):
+    def execCommand(self, cmd, params):
         try:
             self.commands[cmd](params)
             print 'exec command "%s" by %s' % (cmd, self.username)
         except KeyError:
             pass
         except:
-            self.show_message('(%s) ERROR (params:%s)' % (cmd.upper(), params))
+            self.showMessage('(%s) ERROR (params:%s)' % (cmd.upper(), params))
 
 
     #------------------------------------------------------------
@@ -50,7 +47,7 @@ class ChatCommander(object):
     #------------------------------------------------------------
 
     def say(self, params):
-        self.show_message( '(SAY); %s' % ' '.join(params))
+        self.showMessage( '(SAY); %s' % ' '.join(params))
 
     #------------------------------------------------------------
     # sleep command
@@ -77,7 +74,7 @@ class ChatCommander(object):
         
     def gpio_input(self, params):
         value = gpio.output(int(params[0]))
-        self.show_message('(GPIO INPUT);pin%s = %s' % (params[0], value))
+        self.showMessage('(GPIO INPUT);pin%s = %s' % (params[0], value))
 
 
 
