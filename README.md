@@ -70,14 +70,7 @@ sudo amixer cset numid=3 <n>
 
 ### wlan0 を固定IPにする
 
-`sudo emacs /etc/dhcpcd.conf` の最後に以下を追加。
-
-```
-interface wlan0
-    static ip_address=192.168.42.1/8
-```
-
-次に `sudo emacs /etc/network/interfaces` で、以下のように修正します
+`sudo emacs /etc/network/interfaces` で、以下のように修正します
 
 ```
 allow-hotplug wlan0
