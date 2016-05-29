@@ -27,13 +27,13 @@ class ChatCommander(object):
     def run(self, source):
         self.messages  = []
 
-        lst = source.split(';')
+        lst = [tok.strip() for tok in source.split(';')]
         self.username = lst[0]
-        stmlist  = lst[1:]
+        self.filters  = [tok for tok in lst[1:] if tok[0] == '#']
+        cmdlist  = [tok for tok in lst[1:] if tok[0] == '!']
 
-        for stm in stmlist:
-            if len(stm) != 0 and stm[0] != '!': continue
-            tokens = stm[1:].split(' ')
+        for cmd in cmdlist:
+            tokens = cmd[1:].split(' ')
             self.execCommand(tokens[0], tokens[1:])
 
     def execCommand(self, cmd, params):
@@ -71,7 +71,8 @@ class ChatCommander(object):
         fname = 'img/img%02dT%02d%02d%02d_%05d.jpg' % (now.day, now.hour, now.minute, now.second, now.microsecond)
         
         picam.shoot(fname)
-        self.showMessage('(CHEEZ);<img src="%s">' % fname)
+        header_str = ';'.join(['(CHEEZ)'] + self.filters)
+        self.showMessage('%s;<img src="%s">' % (header_str,fname))
 
     #------------------------------------------------------------
     # gpio command
