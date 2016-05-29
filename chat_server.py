@@ -5,6 +5,7 @@ import cgi
 import wsgiref.util
 import re
 from chat_commander import ChatCommander
+from chat_logger import ChatLogger
 
 def wsgi_query(environ):
     wsgi_input     = environ['wsgi.input']
@@ -15,21 +16,27 @@ def wsgi_scheme_and_netloc(environ):
     ''' "<scheme>://<netloc>/" -> ("<scheme>", "<netloc>") '''
     return tuple(wsgiref.util.application_uri(environ).strip('/').split('://'))
 
+class User(object):
+    def __init__(self, ws): self.websocket = ws
+    def send(self, msg):    self.websocket.send(msg)
+    def receive(self):      return self.websocket.receive()
+
 class ChatApp(object):
     def __init__(self):
-        self.ws_list   = set()
+        self.listener_list   = set()
         self.commander = ChatCommander()
         self.commander.setMessageFunction(self.broadcast)
+        self.listener_list.add(ChatLogger('backlog.txt'))
 
     def broadcast(self, msg):
         remove = set()
-        for ws in self.ws_list:
+        for lsnr in self.listener_list:
             try:
-                ws.send(msg)
+                lsnr.send(msg)
             except Exception:
-                remove.add(ws)
-        for ws in remove:
-            self.ws_list.remove(ws)
+                remove.add(lsnr)
+        for lsnr in remove:
+            self.listener_list.remove(lsnr)
 
     def __call__(self, environ, start_response):  
         path    = environ["PATH_INFO"]
@@ -60,15 +67,15 @@ class ChatApp(object):
         return open('./chat_client.html').read() % (uri, username)
 
     def chat_handle(self, environ, start_response):
-        ws = environ['wsgi.websocket']
-        self.ws_list.add(ws)
-        print 'enter!', len(self.ws_list)
+        user = User(environ['wsgi.websocket'])
+        self.listener_list.add(user)
+        print 'enter!', len(self.listener_list)
         while 1:
-            msg = ws.receive()
+            msg = user.receive()
             if msg is None: break
             self.broadcast(msg)
             self.commander.run(msg)
-        print 'exit!', len(ws_list)
+        print 'exit!', len(self.listener_list)
 
     def img_handle(self, environ, start_response, path):
         start_response("200 OK", [("Content-Type", "image/jpeg")])
