@@ -127,7 +127,7 @@ ignore_broadcast_ssid=0
 # Use WPA authentication, use WPA2 and use a pre-shared key
 auth_algs=1
 wpa=2
-wpa_passphrase=a0b0c0d0e0f0g0h0i0j0
+wpa_passphrase=好きなのいれてね
 wpa_key_mgmt=WPA-PSK
 
 # Use AES, instead of TKIP
