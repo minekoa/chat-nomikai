@@ -50,7 +50,8 @@ class ChatApp(object):
             return self.chat_handle(environ, start_response)
         elif re.match('/img/.*', path):
             return self.img_handle(environ, start_response, path)
-     
+        elif re.match('/js/.*', path):
+            return self.js_handle(environ, start_response, path)
         else:
             start_response("404 NOT FOUND", [("Content-Type", "text/plain")])  
             return "404 NOT FOUND ;-p"
@@ -80,6 +81,11 @@ class ChatApp(object):
     def img_handle(self, environ, start_response, path):
         start_response("200 OK", [("Content-Type", "image/jpeg")])
         return open(path[1:],'rb') # remove '/'
+
+    def js_handle(self, environ, start_response, path):
+        start_response("200 OK", [("Content-Type", "text/javascript")])
+        return open(path[1:],'r') # remove '/'
+
         
 if __name__ == '__main__':
     server = pywsgi.WSGIServer(('0.0.0.0', 8080), ChatApp(), handler_class=WebSocketHandler)
