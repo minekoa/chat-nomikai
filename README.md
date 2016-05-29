@@ -54,22 +54,30 @@ sudo amixer cset numid=3 <n>
 ```
 
 |*<n>*|*設定内容*|
+|:---:|---------|
 |0|自動選択|
 |1|ヘッドフォン端子|
 |2|HDMI|
 
 (Open JTalk まわりは、http://qiita.com/kkoba84/items/b828229c374a249965a9 を参考にさせていただきました)
 
-### Wi-Fi AP & DHCPサーバー化
+## Wi-Fi AP & DHCPサーバー化
 
 飲み屋さんの現場で使うには、チャットサーバー自体が無線アクセスポイントになっていたほうが嬉しいです。
 また、本アプリには認証機能がないため、 WEP-Key にそれを代替させることもできます。
 
 以下はその設定方法を記載します。
 
-#### wlan0 を固定IPにする
+### wlan0 を固定IPにする
 
-`sudo emacs /etc/network/interfaces` で、以下のように修正します
+`sudo emacs /etc/dhcpcd.conf` の最後に以下を追加。
+
+```
+interface wlan0
+    static ip_address=192.168.42.1/8
+```
+
+次に `sudo emacs /etc/network/interfaces` で、以下のように修正します
 
 ```
 allow-hotplug wlan0
@@ -78,11 +86,11 @@ allow-hotplug wlan0
 iface wlan0 inet static
 address 192.168.42.1
 netmask 255.255.255.0
-gateway 192.168.42.1
+#gateway 192.168.42.1
 ```
 
 
-#### Wi-Fi APデーモンのインストールと設定
+### Wi-Fi APデーモンのインストールと設定
 
 まず hostapd をインストールします。
 
@@ -153,7 +161,7 @@ OKだったら、起動時に読み込まれるように `sudo emacs /etc/defaul
 に修正します。
 
 
-#### DHCP サーバーのインストールと設定
+### DHCP サーバーのインストールと設定
 
 apt-get でインストールします。
 
@@ -216,7 +224,7 @@ sudo service isc-dhcp-server restart
 でリスタート。
 
 
-#### IFフォワーディングを有効にする
+### IFフォワーディングを有効にする
 
 `sudo emacs /etc/sysctl.conf` を開き、
 
