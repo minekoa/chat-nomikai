@@ -197,19 +197,7 @@ subnet 192.168.42.0 netmask 255.255.255.0 {
 
 を追加します。
 
-以上で設定が終わったので
-
-```
-sudo service isc-dhcp-server restart
-```
-
-でリスタート。これでもう AP につなげるようになっているので、一度繋いで試してみましょう。
-
-#### デーモン
-
-OKだったら、
-
-`sudo nano /etc/default/isc-dhcp-server` を開き、
+次はデーモンの起動設定。`sudo nano /etc/default/isc-dhcp-server` を開き、
 
 ```
 INTERFACES=""
@@ -221,14 +209,21 @@ INTERFACES=""
 INTERFACES="wlan0"
 ```
 
-に変更します。再起動して同じようにつなげることを確認しましょう。
-（ダメな場合は `sudo service isc-dhcp-server status` で何が起きているか見てみるのが吉）
+に変更します。で、
+
+```
+sudo service isc-dhcp-server restart
+```
+
+でリスタート。これでもう AP につなげるようになっているので、一度繋いで試してみましょう。
+
+OKだったら、再起動して同じようにつなげることを確認しましょう。（ダメな場合は `sudo service isc-dhcp-server status` で何が起きているか見てみるのが吉）
 
 
 ### IPフォワーディングを有効にする
 
 IP フォワーディングのカーネルパラメータを有効にする
-`sudo emacs /etc/sysctl.conf` を開き、
+`sudo nano /etc/sysctl.conf` を開き、
 
 ```
 net.ipv4.ip_forward=1
@@ -257,7 +252,7 @@ sudo iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
 sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
 ```
 
-で、保存。起動時に復元されるよう `sudo emacs /lib/dhcpcd/dhcpcd-hooks/70-ipv4-nat` を作成し、
+で、保存。起動時に復元されるよう `sudo nano /lib/dhcpcd/dhcpcd-hooks/70-ipv4-nat` を作成し、
 
 ```
 iptables-restore < /etc/iptables.ipv4.nat
