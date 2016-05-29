@@ -72,7 +72,7 @@ sudo amixer cset numid=3 <n>
 
 ### wlan0 を固定IPにする
 
-`sudo emacs /etc/network/interfaces` で、以下のように修正します
+`sudo nano /etc/network/interfaces` で、以下のように修正します
 
 ```
 allow-hotplug wlan0
@@ -93,7 +93,7 @@ netmask 255.255.255.0
 sudo apt-get install hostapd
 ```
 
-設定ファイルを記述します。`sudo emacs /etc/hostapd/hostapd.conf` で開いて、以下のように編集します。
+設定ファイルを記述します。`sudo nano /etc/hostapd/hostapd.conf` で開いて、以下のように編集します。
 
 ```
 interface=wlan0
@@ -140,9 +140,11 @@ rsn_pairwise=CCMP
 sudo /usr/sbin/hostapd /etc/hostapd/hostapd.conf
 ```
 
-を実行して、configファイルが間違っていないかチェックしましょう。
+を実行して、configファイルが間違っていないかチェックしましょう。この時点で、APとして見ることができるので、無線機器からこのアクセスポイントが見えているかチェックしましょう。(※まだDHCPサーバーが立ち上がっていないので、接続は成功しない）
 
-OKだったら、起動時に読み込まれるように `sudo emacs /etc/default/hostapd` の
+#### デーモン
+
+OKだったら、 `sudo nano /etc/default/hostapd` の
 
 ```
 #DAEMON_CONF=""
@@ -171,13 +173,13 @@ sudo apt-get install isc-dhcp-server
 #option domain-name-servers ns1.example.org, ns2.example.org;
 ```
 
-のように、2行コメントアウトします。次に
+のように、2行コメントアウト、その後 authoritative　をアンコメント。
 
 ```
 authoritative;
 ```
 
-のように、authoritative のコメントアウトを外します。最後にファイルの最後に
+最後にファイルの末尾に
 
 ```
 ping-check true;
@@ -195,8 +197,19 @@ subnet 192.168.42.0 netmask 255.255.255.0 {
 
 を追加します。
 
+以上で設定が終わったので
 
-`sudo emacs /etc/default/isc-dhcp-server` を開き、
+```
+sudo service isc-dhcp-server restart
+```
+
+でリスタート。これでもう AP につなげるようになっているので、一度繋いで試してみましょう。
+
+#### デーモン
+
+OKだったら、
+
+`sudo nano /etc/default/isc-dhcp-server` を開き、
 
 ```
 INTERFACES=""
@@ -205,22 +218,16 @@ INTERFACES=""
 を
 
 ```
-INTERFACES="eth0"
+INTERFACES="wlan0"
 ```
 
-に変更します。
-
-以上で設定が終わったので
-
-```
-sudo service isc-dhcp-server restart
-```
-
-でリスタート。
+に変更します。再起動して同じようにつなげることを確認しましょう。
+（ダメな場合は `sudo service isc-dhcp-server status` で何が起きているか見てみるのが吉）
 
 
-### IFフォワーディングを有効にする
+### IPフォワーディングを有効にする
 
+IP フォワーディングのカーネルパラメータを有効にする
 `sudo emacs /etc/sysctl.conf` を開き、
 
 ```
@@ -236,7 +243,7 @@ sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
 でアクティベート。
 
 
-次に以下のコマンドを実行。
+次にwlan0とeth0の間でルーティングするように、NATテーブルを以下のコマンドで修正。
 
 ```
 sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
@@ -256,7 +263,7 @@ sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
 iptables-restore < /etc/iptables.ipv4.nat
 ```
 
-と保存します。
+の内容で保存します。
 
 ## 使い方
 
