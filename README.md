@@ -149,7 +149,7 @@ OKだったら、起動時に読み込まれるように `sudo emacs /etc/defaul
 を
 
 ```
-#DAEMON_CONF="/etc/hostapd/hostapd.conf"
+DAEMON_CONF="/etc/hostapd/hostapd.conf"
 ```
 に修正します。
 
