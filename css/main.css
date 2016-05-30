@@ -1,0 +1,153 @@
+
+#Main {
+    position : absolute;
+    left : 0px;
+    top  : 0px;
+    right : 0px;
+    bottom : 0px;
+    background : #8BC34A;
+    /*background : url(../img/back.png) center center no-repeat  #8BC34A;*/
+}
+
+div.room {
+    background : rgba(0, 0, 0, 0.2);
+    position : absolute;
+    border-radius : 4px;
+    overflow : hidden;
+}
+
+div.remark {
+    margin : 1em;
+    margin-right : 30px;
+    padding : 0em 1em 1em 0em;
+    background : rgba(255, 255, 255, 0.5);
+    border-radius : 4px;
+    font-size : medium;
+}
+
+.remark-name {
+    display : inline-block;
+    margin : 0em 0em 0.5em 0em;
+    text-align : center;
+    min-width : 6em;
+    margin-left : -1em;
+    transform : rotate(-8deg);
+    padding : 0.5em;
+    border-radius : 4px;
+    box-shadow : 0px 2px 0px rgba(0,0,0,0.8);
+    background : #4CAF50;
+    color : #FAFAFA;
+}
+
+.remark-text {
+    margin-left : 3em;
+    word-wrap : break-word;
+}
+
+.room-leave {
+    position : absolute;
+    width : 72px;
+    height : 32px;
+    right : 0px;
+    top : 0px;
+    cursor : pointer;
+}
+
+.room-remarks {
+    position : absolute;
+    overflow-y : auto;
+    overflow-x : hidden;
+}
+
+.room-form {
+    position : absolute;
+    text-align :center;
+}
+
+.room-form .input {
+    text-align : left;
+    width : 98%;
+    padding : 1%;
+    border-radius : 0px;
+    resize : none;
+    height : 100%;
+    border : none;
+    background : #424242;
+    /*box-shadow : inset 0 2px 0 rgba(0, 0, 0, 0.8);*/
+    color : #FAFAFA;
+}
+
+.room-form .input:before {
+    content : '>>';
+}
+
+#Enter {
+    position : absolute;
+    width : 64px;
+    height : 96px;
+    top : 50%;
+    margin : -32px 0px 0px 0px;
+    cursor : pointer;
+}
+
+#RoomListBack {
+  position : absolute;
+  top : 0px;
+  bottom : 0px;
+  left : 0px;
+  right : 0px;
+  background-color : rgba(0, 0, 0, 0.6);
+  opacity : 0;
+}
+
+#RoomListArea {
+  position : absolute;
+  width : 480px;
+  height : 480px;
+  top : 50%;
+  left : 50%;
+  margin : -240px 0px 0px -240px;
+  background : rgba(255, 255, 255, 0.8);
+  border-radius : 4px;
+}
+
+#RoomListArea input {
+  border : 0px;
+  outline : 0px;
+  margin : 0px 30px 0px 30px;
+  width : 400px;
+  padding : 10px;
+  font-size : 20px;
+  background : #424242;
+  color : #8BC34A;
+  border-radius : 4px;
+
+}
+
+#RoomListLinks {
+  margin : 2em;
+}
+
+#RoomListLinks a {
+  cursor : pointer;
+  background : #424242;
+  border-radius : 4px;
+  padding : 0.5em;
+  color : #FAFAFA;
+  margin : 0.1em;
+}
+
+.room h1 {
+  color : #8BC34A;
+  background : #424242;
+  font-size : 16px;
+  padding : 16px 0px 0px 8px;;
+  font-weight : normal;
+  margin : 0px;
+  position : absolute;
+  top : 0px;
+  left: 0px;
+  right : 0px;
+  height : 32px;
+  z-index : 100;
+}
