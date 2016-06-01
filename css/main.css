@@ -6,11 +6,11 @@
     right : 0px;
     bottom : 0px;
     background : #8BC34A;
-    /*background : url(../img/back.png) center center no-repeat  #8BC34A;*/
+    background : url(../img/back2.png) center center no-repeat  #8BC34A;
 }
 
 div.room {
-    background : rgba(0, 0, 0, 0.2);
+    background : rgba(0, 0, 0, 0.4);
     position : absolute;
     border-radius : 4px;
     overflow : hidden;
@@ -20,7 +20,7 @@ div.remark {
     margin : 1em;
     margin-right : 30px;
     padding : 0em 1em 1em 0em;
-    background : rgba(255, 255, 255, 0.5);
+    background : rgba(255, 255, 255, 0.7);
     border-radius : 4px;
     font-size : medium;
 }
@@ -42,6 +42,11 @@ div.remark {
 .remark-text {
     margin-left : 3em;
     word-wrap : break-word;
+}
+
+.remark-text img {
+    max-width : 160px;
+    border-radius : 4px;
 }
 
 .room-leave {
@@ -98,6 +103,7 @@ div.remark {
   right : 0px;
   background-color : rgba(0, 0, 0, 0.6);
   opacity : 0;
+  z-index : 20;
 }
 
 #RoomListArea {
@@ -137,7 +143,7 @@ div.remark {
   margin : 0.1em;
 }
 
-.room h1 {
+.room h1.name {
   color : #8BC34A;
   background : #424242;
   font-size : 16px;
@@ -149,5 +155,5 @@ div.remark {
   left: 0px;
   right : 0px;
   height : 32px;
-  z-index : 100;
+  z-index : 10;
 }

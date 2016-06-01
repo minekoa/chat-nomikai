@@ -3,7 +3,10 @@
 
 // スタイルとかで使う定数群
 var VP = {
-    FORM_HEIGHT : '128px',
+    FORM_HEIGHT : '72px',
+    IMAGE_TAG : /<\s*(img|image)\s+.*src\s*=\s*('|")(.*)('|")\s*.*>/gim,
+    ANAMES : ['img', 'image', 'marquee', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'font', 'b', 'i', 'span', ],
+    NODETYPE_TEXT : 3,
 };
 
 Object.freeze(VP);
@@ -13,6 +16,14 @@ var remarks = [];
 var ws;
 
 var init = function(){
+    window.addEventListener('beforeunload', function(e){
+        var v = 'チャットから離脱しますか？';
+        e.returnValue = v;    
+        return v;
+    });
+    window.addEventListener('resize', resizePains);
+
+
     ws = new WebSocket(CHAT.url);
     ws.open = function(){ws.send('main;' + CHAT.user + ';hi');};
     ws.onmessage = function(e){
@@ -60,6 +71,7 @@ var addPain = function(roomName) {
     resizePains();
     // Title
     var dCap = document.createElement('h1');
+    dCap.classList.add('name');
     dCap.innerText = roomName;
     dPain.appendChild(dCap);
 
@@ -158,7 +170,9 @@ var addRemark = function(room, name, text) {
     dName.classList.add('remark-name');
     dName.innerText = name;
     dText.classList.add('remark-text');
-    dText.innerText = text;
+    dText.innerHTML = text;
+    htmlFilter(dText);
+
     $(dText).css({opacity:0});
     dRemark.appendChild(dName);
     dRemark.appendChild(dText);
@@ -177,6 +191,20 @@ var addRemark = function(room, name, text) {
     });
     // Text Animation
     $(dText).animate({opacity:1}, 1000);
+};
+
+var htmlFilter = function(dTarget) {
+    var ds = dTarget.childNodes;
+    for (var i = 0; i < ds.length; i++) {
+        var d = ds[i];
+        var t = d.nodeName.toLowerCase();
+        if (d.nodeType === VP.NODETYPE_TEXT) continue;
+        if (VP.ANAMES.indexOf(t) == -1) {
+            var c = document.createTextNode('<censored>');
+            dTarget.replaceChild(c, d);
+        }
+        htmlFilter(d);
+    }
 };
 
 var showRoomList = function() {
