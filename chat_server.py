@@ -76,7 +76,9 @@ class ChatApp(object):
         while 1:
             msg = user.receive()
             if msg is None: break
-            self.broadcast(msg)
+            if not '!ninja' in [i.strip() for i in msg.split(';')]:
+                self.broadcast(msg)
+
             self.commander.run(msg)
         print 'exit!', len(self.listener_list)
 
