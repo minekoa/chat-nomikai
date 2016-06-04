@@ -31,8 +31,8 @@ class ChatCommander(object):
 
         lst = [tok.strip() for tok in source.split(';')]
         username = lst[0]
-        filters  = [tok for tok in lst[1:] if tok[0] == '#']
-        cmdlist  = [tok for tok in lst[1:] if tok[0] == '!']
+        filters  = [tok for tok in lst[1:] if len(tok) != 0 and tok[0] == '#']
+        cmdlist  = [tok for tok in lst[1:] if len(tok) != 0 and tok[0] == '!']
 
         for cmd in cmdlist:
             tokens = cmd[1:].split(' ')
