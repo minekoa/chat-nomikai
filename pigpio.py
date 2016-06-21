@@ -13,6 +13,10 @@ class GPIOCommander(object):
             gpio.setup(servo_ch, gpio.OUT)
             self.servo[servo_ch] = gpio.PWM(servo_ch, 50) # 50hz
             self.servo[servo_ch].start(0.0)
+
+    #----------------------------------------
+    # 普通のGPIO叩くやつ
+    #----------------------------------------
     
     def output(self, ch, value):
         gpio.output(ch, value)
@@ -20,8 +24,20 @@ class GPIOCommander(object):
     def input(self, ch):
         return gpio.input(ch)
 
-    def changeDutyCycle(self, ch, dd):
-        print 'ss ch=%d ,dd=%d,' % (ch, dd)
+    #----------------------------------------
+    # サーボのPWM制御
+    #----------------------------------------
+
+    def sv_start(self, ch):
+        print 's-start ch=%d' % ch
+        self.servo[ch].start(0.0)
+
+    def sv_stop(self, ch):
+        print 's-stop ch=%d' % ch
+        self.servo[ch].stop()
+
+    def sv_changeDutyCycle(self, ch, dd):
+        print 's-cdc ch=%d ,dd=%d,' % (ch, dd)
         self.servo[ch].ChangeDutyCycle(dd)
 
     def __del__(self):

@@ -102,6 +102,8 @@ class ChatCommander(object):
         self.commands['wt'] = self.gpio_output
         self.commands['rd'] = self.gpio_input
         self.commands['ss'] = self.gpio_set_servo
+        self.commands['sstart'] = self.gpio_servo_start
+        self.commands['sstop']  = self.gpio_servo_stop
 
     def gpio_output(self, params, username, filters):
         self.gpio_commander.output(int(params[0]), int(params[1]))
@@ -111,7 +113,15 @@ class ChatCommander(object):
         value = self.gpio_commander.input(int(params[0]))
         self.showMessage('(GPIO INPUT);pin%s = %s' % (params[0], value))
 
+    def gpio_servo_start(self,params, username, filters):
+        ch = int(params[0])
+        self.gpio_commander.sv_start(ch)
+
+    def gpio_servo_stop(self,params, username, filters):
+        ch = int(params[0])
+        self.gpio_commander.sv_stop(ch)
+
     def gpio_set_servo(self, params, username, filters):
         ch = int(params[0])
         dd = int(params[1])
-        self.gpio_commander.changeDutyCycle(ch, dd)
+        self.gpio_commander.sv_changeDutyCycle(ch, dd)
