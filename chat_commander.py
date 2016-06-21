@@ -1,10 +1,9 @@
 #-*- coding: utf-8 -*-
 from gevent import pywsgi, sleep
 
-            
-import RPi.GPIO as gpio
 from jtalk import jtalk
 import picam
+import pigpio
 from datetime import datetime
 
 class ChatCommander(object):
@@ -98,32 +97,21 @@ class ChatCommander(object):
     #------------------------------------------------------------
 
     def elaborateRaspyGpio(self):
-        gpio.setmode(gpio.BCM) # gpio.BCM or gpio.BOARD
-        gpio.setup(11, gpio.OUT)  
-
-        # elabrate servo
-        self.servo = {}
-
-        for servo_ch in [18,23]:
-            gpio.setup(servo_ch, gpio.OUT)
-            self.servo[servo_ch] = gpio.PWM(servo_ch, 50) # 50hz
-            self.servo[servo_ch].start(0.0)
+        self.gpio_commander = pigpio.GPIOCommander()
 
         self.commands['wt'] = self.gpio_output
         self.commands['rd'] = self.gpio_input
         self.commands['ss'] = self.gpio_set_servo
 
     def gpio_output(self, params, username, filters):
+        self.gpio_commander.output(int(params[0]), int(params[1]))
         gpio.output(int(params[0]), int(params[1]))
         
     def gpio_input(self, params, username, filters):
-        value = gpio.output(int(params[0]))
+        value = self.gpio_commander.input(int(params[0]))
         self.showMessage('(GPIO INPUT);pin%s = %s' % (params[0], value))
 
     def gpio_set_servo(self, params, username, filters):
         ch = int(params[0])
-        print 'ss ch=%d ,dd=%d,' % (int(params[0]), int(params[1]))
-        self.servo[ch].ChangeDutyCycle(int(params[1]))
-
-    def __del__(self):
-        self.gpio.clienup()
+        dd = int(params[1])
+        self.gpio_commander.changeDutyCycle(ch, dd)
