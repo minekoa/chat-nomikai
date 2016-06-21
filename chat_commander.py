@@ -98,12 +98,20 @@ class ChatCommander(object):
     #------------------------------------------------------------
 
     def elaborateRaspyGpio(self):
-        gpio.setmode(gpio.BOARD) # or gpio.BOARD
+        gpio.setmode(gpio.BCM) # gpio.BCM or gpio.BOARD
         gpio.setup(11, gpio.OUT)  
-        # gpio.setup(22, gpio.IN)  
+
+        # elabrate servo
+        self.servo = {}
+
+        for servo_ch in [18,23]:
+            gpio.setup(servo_ch, gpio.OUT)
+            self.servo[servo_ch] = gpio.PWM(servo_ch, 50) # 50hz
+            self.servo[servo_ch].start(0.0)
 
         self.commands['wt'] = self.gpio_output
         self.commands['rd'] = self.gpio_input
+        self.commands['ss'] = self.gpio_set_servo
 
     def gpio_output(self, params, username, filters):
         gpio.output(int(params[0]), int(params[1]))
@@ -112,5 +120,10 @@ class ChatCommander(object):
         value = gpio.output(int(params[0]))
         self.showMessage('(GPIO INPUT);pin%s = %s' % (params[0], value))
 
+    def gpio_set_servo(self, params, username, filters):
+        ch = int(params[0])
+        print 'ss ch=%d ,dd=%d,' % (int(params[0]), int(params[1]))
+        self.servo[ch].ChangeDutyCycle(int(params[1]))
 
-
+    def __del__(self):
+        self.gpio.clienup()
