@@ -47,6 +47,8 @@ unzip MMDAgent_Example-1.6.zip MMDAgent_Example-1.6/Voice/*
 sudo cp -r MMDAgent_Example-1.6/Voice/mei/ /usr/share/hts-voice
 ```
 
+(Open JTalk まわりは、 [OpenJTalk + python で日本語テキストを発話 - Qiita](http://qiita.com/kkoba84/items/b828229c374a249965a9) を参考にさせていただきました)
+
 #### ヘッドフォン端子（あるいはHDMI）を使う場合
 ヘッドフォン端子あるいはHDMIを使って音を出したい場合は、加えて以下を設定してください
 
@@ -88,8 +90,6 @@ $ sudo nano /usr/share/alsa/alsa.conf
 これで、USBオーディオで音が鳴らせるはずです。
 
 
-(以上、Open JTalk まわりは、http://qiita.com/kkoba84/items/b828229c374a249965a9 を参考にさせていただきました)
-
 ## Wi-Fi AP & DHCPサーバー化
 
 飲み屋さんの現場で使うには、チャットサーバー自体が無線アクセスポイントになっていたほうが嬉しいです。
@@ -128,7 +128,7 @@ interface=wlan0
 # Use the nl80211 driver with the brcmfmac driver
 driver=nl80211
 
-ssid=ChatDrinkers
+ssid=ChatNomikai
 
 # Use the 2.4GHz band
 hw_mode=g
