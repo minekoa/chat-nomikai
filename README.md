@@ -47,14 +47,14 @@ unzip MMDAgent_Example-1.6.zip MMDAgent_Example-1.6/Voice/*
 sudo cp -r MMDAgent_Example-1.6/Voice/mei/ /usr/share/hts-voice
 ```
 
-### ヘッドフォン端子（あるいはHDMI）を使う場合
+#### ヘッドフォン端子（あるいはHDMI）を使う場合
 ヘッドフォン端子あるいはHDMIを使って音を出したい場合は、加えて以下を設定してください
 
 ```
 sudo amixer cset numid=3 <n>
 ```
 
-|*<n>*|*設定内容*|
+|*&lt;n&gt;*|*設定内容*|
 |:---:|---------|
 |0|自動選択|
 |1|ヘッドフォン端子|
@@ -62,7 +62,7 @@ sudo amixer cset numid=3 <n>
 
 (Open JTalk まわりは、http://qiita.com/kkoba84/items/b828229c374a249965a9 を参考にさせていただきました)
 
-### USBオーディオを使う場合
+#### USBオーディオを使う場合
 
 ```
 $ sudo nano /usr/share/alsa/alsa.conf
