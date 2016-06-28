@@ -45,8 +45,7 @@ unzip MMDAgent_Example-1.6.zip MMDAgent_Example-1.6/Voice/*
 sudo cp -r MMDAgent_Example-1.6/Voice/mei/ /usr/share/hts-voice
 ```
 
-USBスピーカーを使う場合は、以上でOKです。
-
+### ヘッドフォン端子（あるいはHDMI）を使う場合
 ヘッドフォン端子あるいはHDMIを使って音を出したい場合は、加えて以下を設定してください
 
 ```
@@ -60,6 +59,33 @@ sudo amixer cset numid=3 <n>
 |2|HDMI|
 
 (Open JTalk まわりは、http://qiita.com/kkoba84/items/b828229c374a249965a9 を参考にさせていただきました)
+
+### USBオーディオを使う場合
+
+```
+$ sudo nano /usr/share/alsa/alsa.conf
+```
+
+で、alsa.conf を 開き、(1) default.ctrl.cardとdefault.pcm.card の値を0から1に変更、(2) ~/.asoundrc を読み込まないように変更 の二点を修正します。
+
+```
+- defaults.ctl.card 0
+- defaults.pcm.card 0
++ defaults.ctl.card 1
++ defaults.pcm.card 1
+```
+
+```
+           }
+           "/etc/asound.conf"
+-          "~/.asoundrc"
++ #        "~/.asoundrc"
+        ]
+```
+
+(加えて、もし amixer cset numid=3 を 0(auto) 以外に変更した場合は、auto に戻すこと)
+
+これで、USBオーディオで音が鳴らせるはずです。
 
 ## Wi-Fi AP & DHCPサーバー化
 
