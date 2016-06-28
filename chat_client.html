@@ -1,30 +1,25 @@
 <!DOCTYPE html>
-<html>
+<html lang='ja'>
 <head>
-<script src="/js/jquery-1.12.4.min.js"></script>
-<script>
-var url      = "%s";
-var username = "%s";
-$(function() {
-    var data = {};
-    ws = new WebSocket(url);
-    ws.onopen = function() {
-        ws.send(username + ';' + 'hi');
-    };
-    ws.onmessage = function(e) {
-      $("#holder").append($('<p>'+e.data+'</p>'));
-    };
-    $('#sender').append($('<button/>').text('send').click(function(){
-        ws.send(username + ';' + $('#message').val());
-    }));
-});
-</script>
+    <meta charset='UTF-8'>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>chat nomikai</title>
+    <link rel='stylesheet' href='css/normalize.css'>
+    <link rel='stylesheet' href='css/main.css'>
+    <script>
+      var CHAT = {};
+      CHAT.url = "%s";
+      CHAT.user = "%s";
+      Object.freeze(CHAT);
+    </script>
+    <script src='js/jquery-2.2.4.min.js'></script>
+    <script src='js/mousetrap.min.js'></script>
+    <script src='js/jquery.easing.1.3.js'></script>
+    <script src='js/menu.js'></script>
+    <script src='js/main.js'></script>
 </head>
 <body>
-<div id="sender">
-<input type="text" id="message" value="text" />
-</div>
-<h3>Messages</h3>
-<div id="holder"></div>
+    <div id='Main'></div>
+    </div>
 </body>
 </html>

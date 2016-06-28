@@ -52,6 +52,8 @@ class ChatApp(object):
             return self.img_handle(environ, start_response, path)
         elif re.match('/js/.*', path):
             return self.js_handle(environ, start_response, path)
+        elif re.match('/css/.*', path):
+            return self.css_handle(environ, start_response, path)
         else:
             start_response("404 NOT FOUND", [("Content-Type", "text/plain")])  
             return "404 NOT FOUND ;-p"
@@ -74,7 +76,9 @@ class ChatApp(object):
         while 1:
             msg = user.receive()
             if msg is None: break
-            self.broadcast(msg)
+            if not '!ninja' in [i.strip() for i in msg.split(';')]:
+                self.broadcast(msg)
+
             self.commander.run(msg)
         print 'exit!', len(self.listener_list)
 
@@ -86,6 +90,9 @@ class ChatApp(object):
         start_response("200 OK", [("Content-Type", "text/javascript")])
         return open(path[1:],'r') # remove '/'
 
+    def css_handle(self, environ, start_response, path):
+        start_response("200 OK", [("Content-Type", "text/css")])
+        return open(path[1:],'r') # remove '/'
         
 if __name__ == '__main__':
     server = pywsgi.WSGIServer(('0.0.0.0', 8080), ChatApp(), handler_class=WebSocketHandler)

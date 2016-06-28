@@ -1,12 +1,14 @@
+# チャット飲み会専用チャットツール - chat-drinker -
+
 ## これはなに？
 
-チャット飲み会を開こうということになったのですが、チャットシステムをどうしようという話になりました。
+[飲み会はもうチャットでよくないですか - デイリーポータルZ：@nifty](http://portal.nifty.com/kiji/160126195572_1.htm)に触発され、わたしたちもチャット飲み会を開こうということになったのですが、チャットシステムをどうしようという話になりました。
 
 Line？IRC?
 
 それもいいけれども、飲み会の場に主役たるサーバーがいないのってどう思います？片手落ちじゃないですか？
 
-そんな思いに答えるべく、喋って動いて写真まで撮ってくれる、そんな存在感たっぷりのサーバーを飲み会の場に連れて行くためにこのプロジェクトは発足しました。
+そんな思いに答えるべく、喋って動いて写真まで撮ってくれる、そんな存在感たっぷりのサーバーを飲み会の場に連れて行くためにこのプロジェクトは発足しました。(できればサーバーが（物理的に）落ちた！――というベタなこともやりたい）
 
 
 ## システム要件
@@ -96,7 +98,7 @@ $ sudo nano /usr/share/alsa/alsa.conf
 
 ### wlan0 を固定IPにする
 
-`sudo emacs /etc/network/interfaces` で、以下のように修正します
+`sudo nano /etc/network/interfaces` で、以下のように修正します
 
 ```
 allow-hotplug wlan0
@@ -117,7 +119,7 @@ netmask 255.255.255.0
 sudo apt-get install hostapd
 ```
 
-設定ファイルを記述します。`sudo emacs /etc/hostapd/hostapd.conf` で開いて、以下のように編集します。
+設定ファイルを記述します。`sudo nano /etc/hostapd/hostapd.conf` で開いて、以下のように編集します。
 
 ```
 interface=wlan0
@@ -151,7 +153,7 @@ ignore_broadcast_ssid=0
 # Use WPA authentication, use WPA2 and use a pre-shared key
 auth_algs=1
 wpa=2
-wpa_passphrase=a0b0c0d0e0f0g0h0i0j0
+wpa_passphrase=好きなのいれてね
 wpa_key_mgmt=WPA-PSK
 
 # Use AES, instead of TKIP
@@ -164,9 +166,11 @@ rsn_pairwise=CCMP
 sudo /usr/sbin/hostapd /etc/hostapd/hostapd.conf
 ```
 
-を実行して、configファイルが間違っていないかチェックしましょう。
+を実行して、configファイルが間違っていないかチェックしましょう。この時点で、APとして見ることができるので、無線機器からこのアクセスポイントが見えているかチェックしましょう。(※まだDHCPサーバーが立ち上がっていないので、接続は成功しない）
 
-OKだったら、起動時に読み込まれるように `sudo emacs /etc/default/hostapd` の
+#### デーモン
+
+OKだったら、 `sudo nano /etc/default/hostapd` の
 
 ```
 #DAEMON_CONF=""
@@ -195,13 +199,13 @@ sudo apt-get install isc-dhcp-server
 #option domain-name-servers ns1.example.org, ns2.example.org;
 ```
 
-のように、2行コメントアウトします。次に
+のように、2行コメントアウト、その後 authoritative　をアンコメント。
 
 ```
 authoritative;
 ```
 
-のように、authoritative のコメントアウトを外します。最後にファイルの最後に
+最後にファイルの末尾に
 
 ```
 ping-check true;
@@ -219,8 +223,7 @@ subnet 192.168.42.0 netmask 255.255.255.0 {
 
 を追加します。
 
-
-`sudo emacs /etc/default/isc-dhcp-server` を開き、
+次はデーモンの起動設定。`sudo nano /etc/default/isc-dhcp-server` を開き、
 
 ```
 INTERFACES=""
@@ -229,23 +232,24 @@ INTERFACES=""
 を
 
 ```
-INTERFACES="eth0"
+INTERFACES="wlan0"
 ```
 
-に変更します。
-
-以上で設定が終わったので
+に変更します。で、
 
 ```
 sudo service isc-dhcp-server restart
 ```
 
-でリスタート。
+でリスタート。これでもう AP につなげるようになっているので、一度繋いで試してみましょう。
+
+OKだったら、再起動して同じようにつなげることを確認しましょう。（ダメな場合は `sudo service isc-dhcp-server status` で何が起きているか見てみるのが吉）
 
 
-### IFフォワーディングを有効にする
+### IPフォワーディングを有効にする
 
-`sudo emacs /etc/sysctl.conf` を開き、
+IP フォワーディングのカーネルパラメータを有効にする
+`sudo nano /etc/sysctl.conf` を開き、
 
 ```
 net.ipv4.ip_forward=1
@@ -260,7 +264,7 @@ sudo sh -c "echo 1 > /proc/sys/net/ipv4/ip_forward"
 でアクティベート。
 
 
-次に以下のコマンドを実行。
+次にwlan0とeth0の間でルーティングするように、NATテーブルを以下のコマンドで修正。
 
 ```
 sudo iptables -t nat -A POSTROUTING -o eth0 -j MASQUERADE
@@ -274,11 +278,42 @@ sudo iptables -A FORWARD -i wlan0 -o eth0 -j ACCEPT
 sudo sh -c "iptables-save > /etc/iptables.ipv4.nat"
 ```
 
-で、保存。起動時に復元されるよう `sudo emacs /lib/dhcpcd/dhcpcd-hooks/70-ipv4-nat` を作成し、
+で、保存。起動時に復元されるよう `sudo nano /lib/dhcpcd/dhcpcd-hooks/70-ipv4-nat` を作成し、
 
 ```
 iptables-restore < /etc/iptables.ipv4.nat
 ```
 
-と保存します。
+の内容で保存します。
 
+## 使い方
+
+### 起動方法
+
+```
+python chat_server.py
+```
+
+これで 8080 ポートからアクセスできます。
+
+### 発言の仕組み
+一回の発言を文して、`;` で区切られた部分を句として認識します。句はプレーンな通常の発言の他に、フィルター、コマンド を記述することができます。
+
+#### フィルター機能（擬似チャットルーム）
+
+コメントに　#hogehoge;` のように `#`で始まる句を付与すると、そのキーワードがフィルターになります。
+フィルター付きの発言は、同じフィルターがアクティブなクライアントでしか見ることができません。
+
+（という機能を実装予定）
+
+#### コマンド機能
+`!` で始まる句はコマンドになります。コマンドには以下があります。
+
+|*コマンド名*|*書式*|*動作*|
+|------------|------|------|
+|!say |!say <喋らせたい言葉> | テキスト読み上げで喋らせます |
+|!cheez|!cheez | 写真をとります|
+|!sleep|!sleep <スリープする秒数> |指定した秒数だけスリープします。句を複数重ねてコマンドを走らせる場合に使います。sleepで待っている間、当人は新たな発言はできません|
+|!echo|!echo <喋らせたい言葉>|自身を発言主として、<喋らせたい言葉>を発言します。sleep や ninja と併用すると効果的です|
+|!oreore|!oreore <なりすまし名> <喋らせたい言葉>|<なりすまし名>を発言主として、<喋らせたい言葉>を発言します。(なりすまし名には末尾に `'` がつきます)。ninja と併用すると効果的です|
+|!ninja|!ninja|どうコマンド句が含まれる発言の文全体をブロードキャストさせません|
