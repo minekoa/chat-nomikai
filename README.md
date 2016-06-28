@@ -60,8 +60,6 @@ sudo amixer cset numid=3 <n>
 |1|ヘッドフォン端子|
 |2|HDMI|
 
-(Open JTalk まわりは、http://qiita.com/kkoba84/items/b828229c374a249965a9 を参考にさせていただきました)
-
 #### USBオーディオを使う場合
 
 ```
@@ -88,6 +86,9 @@ $ sudo nano /usr/share/alsa/alsa.conf
 (加えて、もし amixer cset numid=3 を 0(auto) 以外に変更した場合は、auto に戻すこと)
 
 これで、USBオーディオで音が鳴らせるはずです。
+
+
+(以上、Open JTalk まわりは、http://qiita.com/kkoba84/items/b828229c374a249965a9 を参考にさせていただきました)
 
 ## Wi-Fi AP & DHCPサーバー化
 
